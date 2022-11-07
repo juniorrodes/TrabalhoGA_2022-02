@@ -66,28 +66,6 @@ public class Node {
 		this.height = Math.max(leftTreeHeight, rightTreeHeight) + 1;
 	}
 
-	public Node getLeftChild() {
-		return leftChild;
-	}
-
-	public Node setLeftChild(Node leftChild) {
-		this.leftChild = leftChild;
-		return leftChild;
-	}
-
-	public Node getRightChild() {
-		return rightChild;
-	}
-
-	public Node setRightChild(Node rightChild) {
-		this.rightChild = rightChild;
-		return rightChild;
-	}
-
-	public int getBalanceFactor() {
-		return balanceFactor;
-	}
-
 	public int getKey() {
 		return key;
 	}

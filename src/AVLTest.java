@@ -9,6 +9,6 @@ public class AVLTest {
 		    t.insert(9);
 		    t.insert(4);
 		    t.insert(2);
-		    t.mostraArvore();
+//		    t.mostraArvore();
 		}
 	}
