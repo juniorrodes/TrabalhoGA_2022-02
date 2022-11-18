@@ -8,15 +8,15 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+public class Node<T extends Comparable<T>> {
 	private int balanceFactor;
-	private int key;
+	private T key;
 	private int height;
 
-	private Node leftChild;
-	private Node rightChild;
+	private Node<T> leftChild;
+	private Node<T> rightChild;
 
-	public Node(int key) {
+	public Node(T key) {
 		this.leftChild = null;
 		this.rightChild = null;
 		this.key = key;
@@ -24,7 +24,7 @@ public class Node {
 		this.balanceFactor = 0;
 	}
 
-	private Node(int key, int height, int balanceFactor) {
+	private Node(T key, int height, int balanceFactor) {
 		this.leftChild = null;
 		this.rightChild = null;
 		this.key = key;
@@ -32,11 +32,11 @@ public class Node {
 		this.balanceFactor = balanceFactor;
 	}
 
-	public Node find(int value) {
-		if (value > this.key && this.rightChild != null) {
+	public Node<T> find(T value) {
+		if (this.key.compareTo(value) > 0 && this.rightChild != null) {
 			return this.rightChild.find(value);
 		}
-		if (value < this.key && this.leftChild != null) {
+		if (this.key.compareTo(value) < 0 && this.leftChild != null) {
 			return this.leftChild.find(value);
 		}
 		if (value == this.key) {
@@ -46,21 +46,21 @@ public class Node {
 		return null;
 	}
 
-	private Node findMax() {
+	private Node<T> findMax() {
 		return this.rightChild == null ? this : this.rightChild.findMax();
 	}
 
-	public Node delete(int value) {
+	public Node<T> delete(T value) {
 		if (find(value) == null) {
 			return null;
 		}
 
-		Node newNode = null;
+		Node<T> newNode = null;
 
-		if (value < this.key) {
+		if (this.key.compareTo(value) < 0) {
 			this.leftChild = this.leftChild.delete(value);
 			newNode = this;
-		} else if (value > this.key) {
+		} else if (this.key.compareTo(value) > 0) {
 			this.rightChild = this.rightChild.delete(value);
 			newNode = this;
 		} else {
@@ -69,7 +69,7 @@ public class Node {
 			} else if (this.rightChild == null) {
 				newNode = this.leftChild;
 			} else {
-				Node max = this.leftChild.findMax();
+				Node<T> max = this.leftChild.findMax();
 
 				this.key = max.key;
 				this.leftChild = this.leftChild.delete(max.key);
@@ -83,10 +83,10 @@ public class Node {
 		return newNode;
 	}
 
-	public void insert(int value) {
+	public void insert(T value) {
 		if (this.find(value) == null) {
-			Node newNode = new Node(value);
-			if (value < this.key) {
+			Node<T> newNode = new Node<T>(value);
+			if (this.key.compareTo(value) < 0) {
 				if (this.leftChild == null) {
 					this.leftChild = newNode;
 				} else {
@@ -118,14 +118,14 @@ public class Node {
 		this.balanceFactor = leftTreeHeight - rightTreeHeight;
 
 		if (this.balanceFactor <= -2 || this.balanceFactor >= 2) {
-			Node newNode = this.balanceTree();
+			Node<T> newNode = this.balanceTree();
 
 			this.updateNodeReference(newNode);
 		}
 	}
 
-	private void updateNodeReference(Node newNode) {
-		Node copy = new Node(this.key, this.height, this.balanceFactor);
+	private void updateNodeReference(Node<T> newNode) {
+		Node<T> copy = new Node<T>(this.key, this.height, this.balanceFactor);
 		copy.leftChild = this.leftChild;
 		copy.rightChild = this.rightChild;
 
@@ -142,7 +142,7 @@ public class Node {
 		}
 	}
 
-	private Node balanceTree() {
+	private Node<T> balanceTree() {
 		if (this.balanceFactor == 2) {
 			if (this.leftChild.balanceFactor == -1) {
 				this.leftChild= this.leftChild.rotateLeft();
@@ -160,8 +160,8 @@ public class Node {
 		return this;
 	}
 
-	private Node rotateLeft() {
-		Node newRoot;
+	private Node<T> rotateLeft() {
+		Node<T> newRoot;
 
 		newRoot = this.rightChild;
 		this.rightChild = newRoot.leftChild;
@@ -172,8 +172,8 @@ public class Node {
 		return newRoot;
 	}
 
-	private Node rotateRight() {
-		Node newRoot;
+	private Node<T> rotateRight() {
+		Node<T> newRoot;
 
 		newRoot = this.leftChild;
 		this.leftChild = newRoot.rightChild;
@@ -184,15 +184,15 @@ public class Node {
 		return newRoot;
 	}
 
-	private void updateAttributes(Node newRoot) {
+	private void updateAttributes(Node<T> newRoot) {
 		this.updateBalance();
 		this.updateTreeHeight();
 		newRoot.updateBalance();
 		newRoot.updateTreeHeight();
 	}
 
-	public List<Integer> inOrder() {
-		List<Integer> list = new ArrayList<Integer>();
+	public List<T> inOrder() {
+		List<T> list = new ArrayList<T>();
 
 		if (this.leftChild != null) {
 			list.addAll(this.leftChild.inOrder());
@@ -205,8 +205,8 @@ public class Node {
 		return list;
 	}
 
-	public List<Integer> preOrder() {
-		List<Integer> list = new ArrayList<Integer>();
+	public List<T> preOrder() {
+		List<T> list = new ArrayList<T>();
 
 		list.add(this.key);
 		if (this.leftChild != null) {
@@ -219,8 +219,8 @@ public class Node {
 		return list;
 	}
 
-	public List<Integer> postOrder() {
-		List<Integer> list = new ArrayList<Integer>();
+	public List<T> postOrder() {
+		List<T> list = new ArrayList<T>();
 
 		if (this.leftChild != null) {
 			list.addAll(this.leftChild.postOrder());
@@ -233,12 +233,20 @@ public class Node {
 		return list;
 	}
 
-	public int getKey() {
-		return key;
-	}
-
-
 	public String toString() {
-		return Integer.toString(getKey());
+		var indentation = "";
+		for (int i = 1; i <= this.height; i++) {
+			indentation = String.format("%s\t", indentation);
+		}
+		if ((this.leftChild == null) && (this.rightChild != null)) {
+			return String.format("%s%s\n%s", indentation, this.key, this.rightChild);
+		}
+		if ((this.leftChild != null) && (this.rightChild == null)) {
+			return String.format("%s%s\n%s", indentation, this.key, this.leftChild);
+		}
+		if ((this.leftChild == null) && (this.rightChild == null)) {
+			return String.format("%s%s", indentation, this.key);
+		}
+		return String.format("%s%s\n%s\n%s", indentation, this.key, this.leftChild, this.rightChild);
 	}
 }
