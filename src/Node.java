@@ -11,39 +11,90 @@ import java.util.List;
 public class Node<T extends Comparable<T>> {
 	private int balanceFactor;
 	private T key;
+	private int index;
 	private int height;
 
 	private Node<T> leftChild;
 	private Node<T> rightChild;
 
-	public Node(T key) {
+	public Node(T key, int index) {
 		this.leftChild = null;
 		this.rightChild = null;
 		this.key = key;
+		this.index = index;
 		this.height = 1;
 		this.balanceFactor = 0;
 	}
 
-	private Node(T key, int height, int balanceFactor) {
+	private Node(T key, int index, int height, int balanceFactor) {
 		this.leftChild = null;
 		this.rightChild = null;
 		this.key = key;
 		this.height = height;
+		this.index = index;
 		this.balanceFactor = balanceFactor;
 	}
 
 	public Node<T> find(T value) {
-		if (this.key.compareTo(value) > 0 && this.rightChild != null) {
+		if (value.compareTo(this.key) > 0 && this.rightChild != null) {
 			return this.rightChild.find(value);
 		}
-		if (this.key.compareTo(value) < 0 && this.leftChild != null) {
+		if (value.compareTo(this.key) < 0 && this.leftChild != null) {
 			return this.leftChild.find(value);
 		}
-		if (value == this.key) {
+		if (value.equals(this.key)) {
 			return this;
 		}
 
 		return null;
+	}
+
+	public Node<T> findName(T nameToSearch) {
+		if (this.key.toString().startsWith(nameToSearch.toString())) {
+			return this;
+		}
+		if (nameToSearch.compareTo(this.key) > 0 && this.rightChild != null) {
+			return this.rightChild.findName(nameToSearch);
+		}
+		if (nameToSearch.compareTo(this.key) < 0 && this.leftChild != null) {
+			return this.leftChild.findName(nameToSearch);
+		}
+
+		return null;
+	}
+
+	public int search(T value) {
+		if (this.find(value) == null) {
+			return -1;
+		}
+
+		if (value.compareTo(this.key) < 0) {
+			return this.leftChild.search(value);
+		} else if (value.compareTo(this.key) > 0) {
+			return this.rightChild.search(value);
+		}
+
+		return this.index;
+	}
+
+	public List<Integer> searchName(T nameToSearch){
+		if (this.findName(nameToSearch) == null) {
+			return null;
+		}
+		List<Integer> list = new ArrayList<Integer>();
+		int a = nameToSearch.compareTo(this.key);
+		if (nameToSearch.compareTo(this.key) < 0 && this.leftChild != null) {
+			list.addAll(this.leftChild.searchName(nameToSearch));
+		}
+		if (nameToSearch.compareTo(this.key) > 0 && this.rightChild != null) {
+			list.addAll(this.rightChild.searchName(nameToSearch));
+		}
+
+		if (this.key.toString().startsWith(nameToSearch.toString())) {
+			list.add(this.index);
+		}
+
+		return list;
 	}
 
 	private Node<T> findMax() {
@@ -83,20 +134,20 @@ public class Node<T extends Comparable<T>> {
 		return newNode;
 	}
 
-	public void insert(T value) {
+	public void insert(T value, int index) {
 		if (this.find(value) == null) {
-			Node<T> newNode = new Node<T>(value);
-			if (this.key.compareTo(value) < 0) {
+			Node<T> newNode = new Node<T>(value, index);
+			if (value.compareTo(this.key) < 0) {
 				if (this.leftChild == null) {
 					this.leftChild = newNode;
 				} else {
-					this.leftChild.insert(value);
+					this.leftChild.insert(value, index);
 				}
 			} else {
 				if (this.rightChild == null) {
 					this.rightChild = newNode;
 				} else {
-					this.rightChild.insert(value);
+					this.rightChild.insert(value, index);
 				}
 			}
 			this.updateBalance();
@@ -125,12 +176,13 @@ public class Node<T extends Comparable<T>> {
 	}
 
 	private void updateNodeReference(Node<T> newNode) {
-		Node<T> copy = new Node<T>(this.key, this.height, this.balanceFactor);
+		Node<T> copy = new Node<T>(this.key, this.index, this.height, this.balanceFactor);
 		copy.leftChild = this.leftChild;
 		copy.rightChild = this.rightChild;
 
 		this.key = newNode.key;
 		this.height = newNode.height;
+		this.index = newNode.index;
 		this.balanceFactor = newNode.balanceFactor;
 
 		if (newNode.leftChild == this) {
